@@ -1,0 +1,33 @@
+body {
+    padding:0;
+    margin:0;
+    font-family: 'Bangers', cursive;
+}
+canvas {
+    display:block;
+    margin:30px auto 0;
+    border:1px solid #ccc;
+    background: url("assets/Tiziana_openGameArt.png") repeat;
+    animation: loader 30s steps(1000) infinite;
+}
+
+@keyframes loader {
+    from {
+        background-position: 0;
+    }
+    to {
+        background-position: 0 -1600px;
+    }
+}
+
+@import url('https://fonts.googleapis.com/css?family=Bangers');
+
+
+/*@font-face {*/
+    /*font-family: 'Six Caps', sans-serif;*/
+    /*src: url('https://fonts.googleapis.com/css?family=Six+Caps');*/
+/*}*/
+/*@font-face {*/
+    /*font-family: 'Bangers', cursive;*/
+    /*src: url('https://fonts.googleapis.com/css?family=Bangers');*/
+/*}*/
