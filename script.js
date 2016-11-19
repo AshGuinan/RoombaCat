@@ -2,9 +2,10 @@ var canvas = document.getElementById('canvas'),
     ctx = canvas.getContext('2d'),
     width = 400,
     height = 500,
-    ship_x = (width / 2), ship_y = 0, ship_w = 70, ship_h = 70,
     rightKey = false,
     leftKey = false,
+    upKey = false,
+    downKey = false,
     enemyTotal = 4,
     enemies = [],
     alive = false,
@@ -12,20 +13,32 @@ var canvas = document.getElementById('canvas'),
     tickCount = 0,
     ticksPerFrame = 0,
     numberOfFrames = 3,
-    lives = 3;
+    startTime,
+    currentTime,
+    total,
+    lives = 3,
+    gameOver = false,
+    audio;
 
 var dog = {
     x: 0,
     y : height/2,
     w : 54,
     h : 90,
-    speed : 4,
+    speed : 5,
     img : new Image()
 };
-
+var cat = {
+    x: 200,
+    y : 0,
+    w : 90,
+    h : 90,
+    img : new Image()
+};
 var rCat = new Image();
 rCat.src = 'assets/catsanddogs_Hiura_Flour.png';
 
+//Function to get the mouse position
 function getMousePos(canvas, event) {
     var rect = canvas.getBoundingClientRect();
     return {
@@ -33,26 +46,28 @@ function getMousePos(canvas, event) {
         y: event.clientY - rect.top
     };
 }
-
+//Function to check whether a point is inside a rectangle
 function isInside(pos, rect){
     return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.heigth && pos.y > rect.y
 }
 
-
+//The rectangle should have x,y,width,height properties
 var rect = {
     x:180,
     y:400,
     width:50,
-    height:50
+    heigth:50
 };
 
 canvas.addEventListener('click', function(evt) {
     var mousePos = getMousePos(canvas, evt);
 
-    if (isInside(mousePos,rect) && lives>0) {
+    if (isInside(mousePos,rect) & lives>0) {
         alive=true;
+        startTime = Date.now();
+        //audio.pause();
     }
-    if (isInside(mousePos,rect) && lives<=0) {
+    if (isInside(mousePos,rect) & lives<=0) {
         alive=true;
         lives = 3;
     }
@@ -62,10 +77,12 @@ function startScreen(){
     var catPosX = 180;
     var catPosY = 180;
     var sec = 10;
-    ctx.drawImage(rCat, 0, 0, ship_w, ship_h, catPosX, catPosY, ship_w, ship_h);
+    // audio = new Audio('assets/BrandonMorris_LoadingScreenLoop.wav');
+    // audio.play();
+    ctx.drawImage(rCat, 0, 0, cat.w, cat.h, catPosX, catPosY, cat.w, cat.h);
     ctx.font = "bold 36px Six Caps";
     ctx.fillStyle = 'black';
-    ctx.fillText('THE ADVENTURES OF', 100, 300, 200);
+    ctx.fillText('THE ADVENTURES OF', 25, 300, 200);
     ctx.font = "bold 36px Bangers";
     ctx.fillStyle = 'black';
     ctx.fillText('ROOMBA CAT', 25, 400, 350);
@@ -115,16 +132,25 @@ function clearCanvas() {
 }
 
 function drawCat() {
-    if (rightKey) ship_x += 5;
-    else if (leftKey) ship_x -= 5;
-    if (ship_x <= 0){
-        ship_x = 0;
+    if (rightKey) cat.x += 5;
+    else if (leftKey) cat.x -= 5;
+    if (upKey) cat.y -=5;
+    else if (downKey) cat.y +=5;
+    if (cat.x <= 0){
+        cat.x = 0;
     }
-    if ((ship_x + ship_w) >= width){
-        ship_x = width - 70;
+    if(cat.y <=0){
+        cat.y = 0;
     }
 
-    ctx.drawImage(rCat, frameIndex * ship_w, 0, ship_w, ship_h, ship_x, ship_y, ship_w, ship_h);
+    if(cat.y >=80){
+        cat.y = 80;
+    }
+    if ((cat.x + cat.w) >= width){
+        cat.x = width - 90;
+        console.log('Help?');
+    }
+    ctx.drawImage(rCat, frameIndex * cat.w, 0, cat.w, cat.h, cat.x, cat.y, cat.w, cat.h);
 }
 
 function updateDFrame() {
@@ -162,13 +188,26 @@ function updateCFrame() {
         }
     }
 }
+
 function drawEnemies() {
     for (var i = 0; i < enemies.length; i++) {
         dog.img.src = 'assets/dog.png';
         ctx.drawImage(dog.img, frameIndex * dog.w, 0, dog.w, dog.h, enemies[i].x, enemies[i].y,  dog.w, dog.h);
     }
+    console.log(enemies.length);
 }
 
+function drawFurniture() {
+    for (var i = 0; i < 3; i++) {
+        var furniture = new Image(),
+            fWidth = 100, fHeight = 85, fX = Math.random() * 350, fY = height;
+        fY+=100;
+
+        furniture.src = 'assets/Big_furniture.png';
+        ctx.drawImage(furniture, fWidth, 0, fWidth, fHeight, fX, fY, fWidth, fHeight);
+    }
+    console.log(enemies.length);
+}
 
 function moveEnemies() {
     for (var i = 0; i < enemies.length; i++) {
@@ -180,40 +219,18 @@ function moveEnemies() {
            enemies[i].x =  Math.random() * width;
         }
     }
+    currentTime = Date.now();
 }
 
 function shipCollision() {
-    var ship_xw = ship_x + ship_w,
-        ship_yh = ship_y + ship_h;
+    var cat_xw = cat.x + cat.w,
+        cat_yh = cat.y + cat.h;
     for (var i = 0; i < enemies.length; i++) {
         if(lives > 0){
-            if (ship_x > enemies[i].x && ship_x < enemies[i].x + enemies[i].w && ship_y > enemies[i].y && ship_y < enemies[i].y + enemies[i].h) {
-                enemies[i].y = height;
+            if (cat.x < enemies[i].x + enemies[i].w && cat.x + cat.w > enemies[i].x && cat.y < enemies[i].y + enemies[i].h && cat.h + cat.y > enemies[i].y) {
+                enemies[i].y = height + 50;
                 enemies[i].x =  Math.random() * width;
                 lives = lives -1;
-                console.log(lives);
-                console.log('Dead');
-            }
-            if (ship_xw < enemies[i].x + enemies[i].w && ship_xw > enemies[i].x && ship_y > enemies[i].y && ship_y < enemies[i].y + enemies[i].h) {
-                enemies[i].y = height;
-                enemies[i].x =  Math.random() * width;
-                lives = lives -1;
-                console.log(lives);
-                console.log('Dead');
-            }
-            if (ship_yh > enemies[i].y && ship_yh < enemies[i].y + enemies[i].h && ship_x > enemies[i].x && ship_x < enemies[i].x + enemies[i].w) {
-                enemies[i].y = height;
-                enemies[i].x =  Math.random() * width;
-                lives = lives -1;
-                console.log(lives);
-                console.log('Dead');
-            }
-            if (ship_yh > enemies[i].y && ship_yh < enemies[i].y + enemies[i].h && ship_xw < enemies[i].x + enemies[i].w && ship_xw > enemies[i].x) {
-                enemies[i].y = height;
-                enemies[i].x =  Math.random() * width;
-                lives = lives -1;
-                console.log(lives);
-                console.log('Dead');
             }
         } else {
             alive = false;
@@ -227,22 +244,27 @@ function drawTrimmings() {
         heart.src = 'assets/heart_NicoleMarieProductions.png';
         ctx.drawImage(heart, (i*30), 450);
     }
-
+    total = Math.floor((currentTime - startTime)/1000);
+    console.log(total);
 }
 
 function keyDown(e) {
     if (e.keyCode == 39) rightKey = true;
     else if (e.keyCode == 37) leftKey = true;
+    else if (e.keyCode == 38) upKey = true;
+    else if (e.keyCode == 40) downKey = true;
 }
 
 function keyUp(e) {
     if (e.keyCode == 39) rightKey = false;
     else if (e.keyCode == 37) leftKey = false;
-    console.log(ship_x);
+    else if (e.keyCode == 38) upKey = false;
+    else if (e.keyCode == 40) downKey = false;
 }
 
 function scoreTotal() {
     if (lives <= 0) {
+        gameOver = true;
         ctx.font = "bold 36px Arial";
         ctx.fillText('GAME OVER!', 95, 300);
         ctx.beginPath();
@@ -275,6 +297,7 @@ function gameLoop() {
         drawCat();
         drawEnemies();
         moveEnemies();
+        drawFurniture();
         shipCollision();
         drawTrimmings();
     }
