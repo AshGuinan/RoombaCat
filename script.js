@@ -201,7 +201,7 @@ function drawFurniture() {
         var fWidth = 100, fHeight = 85, fX, fY = height;
         fY+=100;
         fX = Math.random() * 350;
-        furniture.src = 'assets/Big_furniture.png';
+        furniture.src = 'assets/small_tables.png';
         ctx.drawImage(furniture, fWidth, 0, fWidth, fHeight, fX, fY, fWidth, fHeight);
         console.log('Furniture!');
     }
@@ -300,9 +300,12 @@ function gameLoop() {
         drawFurniture();
         shipCollision();
         drawTrimmings();
+        document.getElementById('sound').pause();
+
     }
     if(!alive && lives>0){
         startScreen();
+        document.getElementById('sound').play();
     }
     scoreTotal();
 }
