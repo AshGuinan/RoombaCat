@@ -148,7 +148,6 @@ function drawCat() {
     }
     if ((cat.x + cat.w) >= width){
         cat.x = width - 90;
-        console.log('Help?');
     }
     ctx.drawImage(rCat, frameIndex * cat.w, 0, cat.w, cat.h, cat.x, cat.y, cat.w, cat.h);
 }
@@ -194,19 +193,19 @@ function drawEnemies() {
         dog.img.src = 'assets/dog.png';
         ctx.drawImage(dog.img, frameIndex * dog.w, 0, dog.w, dog.h, enemies[i].x, enemies[i].y,  dog.w, dog.h);
     }
-    console.log(enemies.length);
 }
 
 function drawFurniture() {
     for (var i = 0; i < 3; i++) {
-        var furniture = new Image(),
-            fWidth = 100, fHeight = 85, fX = Math.random() * 350, fY = height;
+        var furniture = new Image();
+        var fWidth = 100, fHeight = 85, fX, fY = height;
         fY+=100;
-
+        fX = Math.random() * 350;
         furniture.src = 'assets/Big_furniture.png';
         ctx.drawImage(furniture, fWidth, 0, fWidth, fHeight, fX, fY, fWidth, fHeight);
+        console.log('Furniture!');
     }
-    console.log(enemies.length);
+    //console.log(enemies.length);
 }
 
 function moveEnemies() {
@@ -228,9 +227,10 @@ function shipCollision() {
     for (var i = 0; i < enemies.length; i++) {
         if(lives > 0){
             if (cat.x < enemies[i].x + enemies[i].w && cat.x + cat.w > enemies[i].x && cat.y < enemies[i].y + enemies[i].h && cat.h + cat.y > enemies[i].y) {
-                enemies[i].y = height + 50;
+                enemies[i].y = height;
                 enemies[i].x =  Math.random() * width;
                 lives = lives -1;
+                console.log("###" + i + ": " + enemies[i].y);
             }
         } else {
             alive = false;
@@ -245,7 +245,7 @@ function drawTrimmings() {
         ctx.drawImage(heart, (i*30), 450);
     }
     total = Math.floor((currentTime - startTime)/1000);
-    console.log(total);
+    //console.log(total);
 }
 
 function keyDown(e) {
