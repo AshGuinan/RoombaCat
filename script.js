@@ -19,6 +19,8 @@ var canvas = document.getElementById('canvas'),
     lives = 3,
     gameOver = false,
     audio,
+    impact,
+    meow,
     loadCredits = false;
 
 var dog = {
@@ -303,9 +305,18 @@ function shipCollision() {
                 enemies[i].y = height;
                 enemies[i].x =  Math.random() * width;
                 lives = lives -1;
+                meow = new Audio('assets/Cat_3.wav');
+                impact= new Audio('assets/Dog Woof-SoundBible.mp3');
+                impact.addEventListener('canplaythrough', function() {
+                    this.play();
+                }, false);
+
             }
         } else {
             alive = false;
+            meow.addEventListener('canplaythrough', function() {
+                this.play();
+            }, false);
         }
     }
 }
@@ -398,27 +409,28 @@ function creditScreen(){
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.font = "bold 20px Bangers";
-    ctx.fillText('Credits', 200, 100);
-    ctx.fillText('Music: ', 200, 130);
+    ctx.fillText('Credits', 200, 80);
+    ctx.fillText('Music: ', 200, 110);
     ctx.font = "16px Arial";
-    ctx.fillText('Cat Song -- Dan Knoflicek', 200, 150);
+    ctx.fillText('Cat Song -- Dan Knoflicek', 200, 130);
     ctx.font = "bold 16px Arial";
-    ctx.fillText('Available at: ', 200, 170);
+    ctx.fillText('Available at: ', 200, 150);
     ctx.font = "16px Arial";
-    ctx.fillText('http://opengameart.org/content/cat-song', 200, 190);
+    ctx.fillText('http://opengameart.org/content/cat-song', 200, 170);
     ctx.font = "20px Bangers";
-    ctx.fillText('Sprites ', 200, 220);
-    ctx.fillText('Monty the Dogs: ', 200, 250);
+    ctx.fillText('Sprites ', 200, 200);
+    ctx.fillText('Monty the Dogs: ', 200, 230);
     ctx.font = "16px Arial";
-    ctx.fillText('Hiura Flour', 200, 270);
+    ctx.fillText('Hiura Flour', 200, 250);
     ctx.font = "20px Bangers";
-    ctx.fillText('Mac, the Roomba Cat: ', 200, 300);
+    ctx.fillText('Mac, the Roomba Cat: ', 200, 270);
     ctx.font = "16px Arial";
-    ctx.fillText('Based on content by Hiura Flour', 200, 320);
+    ctx.fillText('Based on content by Hiura Flour', 200, 300);
     ctx.font = "bold 16px Arial";
-    ctx.fillText('Spritesheet available at: ', 200, 340);
+    ctx.fillText('Spritesheet available at: ', 200, 320);
     ctx.font = "16px Arial";
-    ctx.fillText('https://grandmadebslittlebits.wordpress.com/', 200, 360, 290);
+    ctx.fillText('https://grandmadebslittlebits.wordpress.com/', 200, 340, 290);
+    ctx.fillText('Heart Sprite by NicoleMarieProductions', 200, 370, 290);
     ctx.font = "20px Bangers";
     ctx.fillText('Background: ', 200, 390);
     ctx.font = "16px Arial";
