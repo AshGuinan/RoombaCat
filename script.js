@@ -429,7 +429,10 @@ function scoreTotal() {
 
 //Draw credits screen
 function creditScreen(){
-    ctx.fillStyle = 'black';
+    audio.pause();
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.font = "bold 20px Bangers";
     ctx.fillText('Credits', 200, 80);
@@ -446,7 +449,7 @@ function creditScreen(){
     ctx.font = "16px Arial";
     ctx.fillText('Hiura Flour', 200, 250);
     ctx.font = "20px Bangers";
-    ctx.fillText('Mac, the Roomba Cat: ', 200, 270);
+    ctx.fillText('Mac, the Roomba Cat: ', 200, 280);
     ctx.font = "16px Arial";
     ctx.fillText('Based on content by Hiura Flour', 200, 300);
     ctx.font = "bold 16px Arial";
@@ -489,7 +492,6 @@ function gameLoop() {
         drawCat();
         drawEnemies();
         moveEnemies();
-        createLives();
         drawLives();
         collectLife();
         shipCollision();
