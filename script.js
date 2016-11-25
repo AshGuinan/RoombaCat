@@ -23,6 +23,7 @@ var canvas = document.getElementById('canvas'),
     meow,
     loadCredits = false;
 
+//Dog, cat, battery objects
 var dog = {
     x: 0,
     y : height/2,
@@ -47,6 +48,7 @@ var battery = {
     speed : 4,
     img : new Image()
 };
+
 var rCat = new Image();
 rCat.src = 'assets/catsanddogs_Hiura_Flour.png';
 
@@ -58,12 +60,12 @@ function getMousePos(canvas, event) {
         y: event.clientY - rect.top
     };
 }
-//Function to check whether a point is inside a rectangle
+//Function to check whether a point is inside a button
 function isInside(pos, rect){
     return pos.x > rect.x && pos.x < rect.x+rect.width && pos.y < rect.y+rect.height && pos.y > rect.y
 }
 
-//The rectangle should have x,y,width,height properties
+//The clickable buttons
 var go_Button = {
     x:180,
     y:400,
@@ -92,34 +94,40 @@ var credit_Button = {
     height:30
 };
 
+//Listen for click events on the canvas
 canvas.addEventListener('click', function(evt) {
     var mousePos = getMousePos(canvas, evt);
 
+    //If inside the 'go' button, and lives are present, start the game
     if (isInside(mousePos,go_Button) && lives>0) {
         alive=true;
         startTime = Date.now();
     }
+    //If inside the 'go' button, and lives are not present,
+    // refill lives and return to main menu
     if (isInside(mousePos,go_Button) && lives<=0) {
         alive=false;
         lives = 3;
         total = 0;
         startTime = Date.now();
-        console.log('ping');
     }
+    //If inside 'off' button, turn music off
     if (isInside(mousePos,off_Button)) {
         audio.pause();
         console.log('pause');
     }
+    //If inside 'on' button, turn music on
     if (isInside(mousePos,on_Button)) {
         audio.play();
         console.log('play');
     }
-
+    //If inside 'credits' button, show credits
     if (isInside(mousePos,credit_Button)) {
         loadCredits = true;
     }
 }, false);
 
+//Draw sound on/off buttons on canvas
 function audioButtons(){
     ctx.beginPath();
     ctx.rect(off_Button.x, off_Button.y, off_Button.height, off_Button.width);
@@ -149,6 +157,8 @@ function audioButtons(){
     ctx.stroke();
     ctx.closePath();
 }
+
+//Draw start screen, including buttons and cat
 function startScreen(){
     var catPosX = 165;
     var catPosY = 180;
@@ -175,13 +185,15 @@ function startScreen(){
     loadCredits = false;
 }
 
+//Create enemies
 function createEnemies (){
     for (var i = 0; i < enemyTotal; i++) {
+        //Place the location of the dogs
         dog.x += dog.w + Math.random() * (60 - 20) + 20;
-
         if ((dog.x + dog.w)>=width){
             dog.x = Math.random() * 10;
-            dog.y = dog.y + 100;
+            dog.y += Math.random() * (200 - 100) + 100;
+            //Push dogs into array
             enemies.push({
                 x: dog.x,
                 y: dog.y,
@@ -202,6 +214,7 @@ function createEnemies (){
         }
     }
 }
+//Draw dogs on canvas
 function drawEnemies() {
     for (var i = 0; i < enemies.length; i++) {
         dog.img.src = 'assets/dog.png';
@@ -209,6 +222,7 @@ function drawEnemies() {
     }
 }
 
+//Move dog sprites up the canvas
 function moveEnemies() {
     for (var i = 0; i < enemies.length; i++) {
         if (enemies[i].y <= height) {
@@ -219,12 +233,11 @@ function moveEnemies() {
             enemies[i].x =  Math.random() * width;
         }
     }
+    //Scoring
     currentTime = Date.now();
 }
-function createLives (){
 
-}
-
+//Create, draw and move batteries on screen
 function drawLives() {
         battery.img.src = 'assets/battery.png';
         ctx.drawImage(battery.img, 0, 0,battery.w, battery.h, battery.x, battery.y,  battery.w, battery.h);
@@ -236,11 +249,12 @@ function drawLives() {
             battery.x = Math.random() * width;
         }
 }
-
+//Clear canvas for next game loop
 function clearCanvas() {
     ctx.clearRect(0,0,width,height);
 }
 
+//Move and draw cat on canvas
 function drawCat() {
     if (rightKey) cat.x += 5;
     else if (leftKey) cat.x -= 5;
@@ -262,6 +276,7 @@ function drawCat() {
     ctx.drawImage(rCat, frameIndex * cat.w, 0, cat.w, cat.h, cat.x, cat.y, cat.w, cat.h);
 }
 
+//Update dog animation
 function updateDFrame() {
 
     tickCount += 1;
@@ -280,6 +295,7 @@ function updateDFrame() {
     }
 }
 
+//Update cat animation
 function updateCFrame() {
 
     tickCount += 1;
@@ -298,14 +314,15 @@ function updateCFrame() {
     }
 }
 
+//Collision detection
 function shipCollision() {
     for (var i = 0; i < enemies.length; i++) {
         if(lives > 0){
+            //If cat collides with dog, lose life, play bark and continue
             if (cat.x < enemies[i].x + enemies[i].w && cat.x + cat.w > enemies[i].x && cat.y < enemies[i].y + enemies[i].h && cat.h + cat.y > enemies[i].y) {
                 enemies[i].y = height;
                 enemies[i].x =  Math.random() * width;
                 lives = lives -1;
-                meow = new Audio('assets/Cat_3.wav');
                 impact= new Audio('assets/Dog Woof-SoundBible.mp3');
                 impact.addEventListener('canplaythrough', function() {
                     this.play();
@@ -313,14 +330,16 @@ function shipCollision() {
 
             }
         } else {
+            //Game over, make cat meow
             alive = false;
+            meow = new Audio('assets/Cat_3.wav');
             meow.addEventListener('canplaythrough', function() {
                 this.play();
             }, false);
         }
     }
 }
-
+//Collision detection - if cat collides with battery, add life.
 function collectLife() {
     if(lives > 0) {
         if (cat.x < battery.x + battery.w && cat.x + cat.w > battery.x && cat.y < battery.y + battery.h && cat.h + cat.y > battery.y) {
@@ -331,11 +350,11 @@ function collectLife() {
             } else {
                 lives = 5;
             }
-
         }
     }
 }
 
+//Draw lives remaining and current score
 function drawTrimmings() {
     for(var i =1; i <=lives; i++){
         var heart = new Image();
@@ -349,6 +368,7 @@ function drawTrimmings() {
 
 }
 
+//Key presses
 function keyDown(e) {
     if (e.keyCode == 39) rightKey = true;
     else if (e.keyCode == 37) leftKey = true;
@@ -363,6 +383,8 @@ function keyUp(e) {
     else if (e.keyCode == 40) downKey = false;
 }
 
+//Store highscore in local storage
+//Draw game over screen
 function scoreTotal() {
     var highscore = localStorage.getItem("highscore");
     if (lives <= 0) {
@@ -405,18 +427,19 @@ function scoreTotal() {
     }
 }
 
+//Draw credits screen
 function creditScreen(){
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.font = "bold 20px Bangers";
     ctx.fillText('Credits', 200, 80);
-    ctx.fillText('Music: ', 200, 110);
+    ctx.fillText('Music/Sound Effects: ', 200, 110);
     ctx.font = "16px Arial";
-    ctx.fillText('Cat Song -- Dan Knoflicek', 200, 130);
+    ctx.fillText('Cat Song & Cat SFX -- Dan Knoflicek', 200, 130);
     ctx.font = "bold 16px Arial";
     ctx.fillText('Available at: ', 200, 150);
     ctx.font = "16px Arial";
-    ctx.fillText('http://opengameart.org/content/cat-song', 200, 170);
+    ctx.fillText('http://opengameart.org/users/macro', 200, 170);
     ctx.font = "20px Bangers";
     ctx.fillText('Sprites ', 200, 200);
     ctx.fillText('Monty the Dogs: ', 200, 230);
@@ -440,7 +463,7 @@ function creditScreen(){
     ctx.font = "16px Arial";
     ctx.fillText('http://opengameart.org/content/terracottabeige-stone-tile-floor-256px', 200, 450, 320);
     ctx.font = "20px Bangers";
-    ctx.fillText('Battery Sprite & Code : Aisling Guinan', 200, 470);
+    ctx.fillText('Battery Sprite & Game Code : Aisling Guinan', 200, 470);
     ctx.font = "10px Bangers";
     ctx.fillText('4BCT -- 13364696 -- 2016', 200, 490);
 }
@@ -481,7 +504,6 @@ function gameLoop() {
     if(loadCredits==false){
         scoreTotal();
     }
-
 }
 
     window.onload = init;
