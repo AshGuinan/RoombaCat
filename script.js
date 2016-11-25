@@ -192,7 +192,7 @@ function createEnemies (){
         dog.x += dog.w + Math.random() * (60 - 20) + 20;
         if ((dog.x + dog.w)>=width){
             dog.x = Math.random() * 10;
-            dog.y += Math.random() * (200 - 100) + 100;
+            dog.y += Math.random() * (175 - 100) + 175;
             //Push dogs into array
             enemies.push({
                 x: dog.x,
