@@ -87,6 +87,13 @@ var on_Button = {
     height:20
 };
 
+var back_Button = {
+    x:75,
+    y:15,
+    width:30,
+    height:50
+};
+
 var credit_Button = {
     x:180,
     y:440,
@@ -124,6 +131,14 @@ canvas.addEventListener('click', function(evt) {
     //If inside 'credits' button, show credits
     if (isInside(mousePos,credit_Button)) {
         loadCredits = true;
+    }
+
+    //move to credits function!
+    if (isInside(mousePos,back_Button)) {
+        // Clear the canvas after credits - doesn't fix the diplay problem, but might help with similar things
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+        loadCredits = false;
+        gameOver = false;
     }
 }, false);
 
@@ -190,7 +205,7 @@ function createEnemies (){
     for (var i = 0; i < enemyTotal; i++) {
         //Place the location of the dogs
         dog.x += dog.w + Math.random() * (60 - 20) + 20;
-        if ((dog.x + dog.w)>=width){
+        if (20 >(dog.x + dog.w)>=(width-50)){
             dog.x = Math.random() * 10;
             dog.y += Math.random() * (175 - 100) + 175;
             //Push dogs into array
@@ -397,9 +412,12 @@ function scoreTotal() {
         }
         gameOver = true;
         loadCredits = false;
+
+        ctx.textAlign = 'start';
         ctx.font = "bold 36px Bangers";
         ctx.fillText('GAME OVER!', 130, 300);
-        ctx.fillText('High Score: '+ highscore, 115, 340);
+        ctx.fillText('Score: '+ total, 145, 340);
+        ctx.fillText('High Score: '+ highscore, 115, 370);
         ctx.beginPath();
         ctx.rect(180, 400, 60, 30);
         ctx.fillStyle = '#FFFFFF';
@@ -429,12 +447,32 @@ function scoreTotal() {
 
 //Draw credits screen
 function creditScreen(){
+    console.log('show credits.');
     audio.pause();
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.font = "bold 20px Bangers";
+
+    ctx.beginPath();
+    ctx.rect(back_Button.x, back_Button.y, back_Button.height, back_Button.width);
+    ctx.fillText('Back', 95, 37);
+    ctx.font = "bold 16px Arial";
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = 'rgba(225,225,225,0.5)';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
+    ctx.font = "bold 16px Arial";
+    ctx.fillStyle = 'black';
+    ctx.fillText('On', 52, 35, 15);
+    ctx.stroke();
+    ctx.closePath();
+
+    console.log('show credits text.');
+
+    ctx.fillStyle = 'white';
     ctx.fillText('Credits', 200, 80);
     ctx.fillText('Music/Sound Effects: ', 200, 110);
     ctx.font = "16px Arial";
